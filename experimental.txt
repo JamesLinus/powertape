@@ -1,5 +1,1 @@
-This this an orphan branch (does not share a common ancestor).
-
-It can be created using:
-
-git checkout --orphan branch-name
+Gerrit is not able to work with orphan branches, and refuses reviews with "no common ancestry" error.
