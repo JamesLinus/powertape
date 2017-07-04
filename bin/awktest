@@ -1,0 +1,31 @@
+#!/bin/bash
+set -eo pipefail
+
+function zzz() {
+  for i in $(seq 100)
+  do
+    printf "$i\n"
+    sleep 0.2
+  done
+}
+
+# MacOS awk does not have systime() extension
+which gawk >/dev/null && AWK=gawk || AWK=awk
+zzz | $AWK -v offset=2 '
+{
+     if (NR <= offset) print;
+     else {
+         a[NR] = $0;
+         delete a[NR-offset];
+         currTime = systime()
+         if ( (currTime - prevTime) > 5 ) {
+             printf 'INFO: %s lines redirected to file\n', NR | "cat>&2"
+             prevTime = currTime
+         }
+         }
+ }
+ END {
+   print "" > "/dev/stderr";
+   for(i=NR-offset+1 > offset ? NR-offset+1: offset+1 ;i<=NR;i++)
+   { print a[i]}
+ }'
